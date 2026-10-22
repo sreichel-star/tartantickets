@@ -1,0 +1,130 @@
+/* Color tokens (UX spec: ink, accent, surface). All text pairs meet 4.5:1 contrast. */
+:root {
+  --ink: #1f1f1f;          /* main text */
+  --ink-muted: #4d4d4d;    /* secondary text: 8.4:1 on white */
+  --accent: #b5102c;       /* deep red: 6.6:1 on white */
+  --accent-strong: #8c0c22;/* hover/pressed */
+  --on-accent: #ffffff;
+  --surface: #ffffff;      /* cards */
+  --surface-page: #f3f3f1; /* page background */
+  --border: #d6d6d2;
+  --focus: #1a5fb4;
+  --radius: 10px;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--surface-page);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+}
+
+.container {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+}
+.skip-link:focus {
+  left: 16px;
+  top: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  z-index: 10;
+}
+
+.site-header {
+  background: var(--accent);
+  color: var(--on-accent);
+  padding: 14px 0;
+}
+.logo {
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: 0.01em;
+}
+
+main { padding-top: 24px; padding-bottom: 48px; }
+
+h1 { font-size: 1.75rem; margin: 0 0 20px; }
+
+.event-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  display: flex;
+}
+.card article { display: flex; flex-direction: column; width: 100%; }
+
+.club {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.title { margin: 2px 0 6px; font-size: 1.25rem; }
+.description { margin: 0 0 14px; color: var(--ink-muted); }
+
+.details { margin: 0 0 16px; display: grid; gap: 6px; }
+.details div { display: flex; gap: 8px; }
+.details dt { font-weight: 600; min-width: 72px; }
+.details dd { margin: 0; }
+
+.seats-low, .seats-out { color: var(--accent); font-weight: 700; }
+
+.action { margin-top: auto; }
+
+.button {
+  font: inherit;
+  font-weight: 600;
+  background: var(--accent);
+  color: var(--on-accent);
+  border: 0;
+  border-radius: var(--radius);
+  padding: 10px 18px;
+  min-height: 44px;
+  cursor: pointer;
+}
+.button:hover { background: var(--accent-strong); }
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.coming-soon {
+  margin: 8px 0 0;
+  min-height: 1.5em;
+  color: var(--ink-muted);
+  font-weight: 600;
+}
+
+.empty, .status {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  color: var(--ink-muted);
+}
+.status p { margin-top: 0; }
