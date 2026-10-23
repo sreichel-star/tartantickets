@@ -38,6 +38,16 @@ export type SentEmail = {
 
 let orders: Order[] = [];
 let outbox: SentEmail[] = [];
+// SEC-16: when each student+event checkout block ends (key: "buyerKey|eventId").
+let checkoutBlocks = new Map<string, number>();
+
+export function getCheckoutBlock(buyerKey: string, eventId: string): number | undefined {
+  return checkoutBlocks.get(`${buyerKey}|${eventId}`);
+}
+
+export function setCheckoutBlock(buyerKey: string, eventId: string, untilMs: number): void {
+  checkoutBlocks.set(`${buyerKey}|${eventId}`, untilMs);
+}
 
 /** A held order counts against seats until its hold time runs out. */
 export function isActiveHold(order: Order, now: Date): boolean {
@@ -74,4 +84,5 @@ export function getOutbox(): SentEmail[] {
 export function __resetOrders(): void {
   orders = [];
   outbox = [];
+  checkoutBlocks = new Map();
 }

@@ -6,18 +6,27 @@ import {
   HOLD_MINUTES,
   addOrder,
   findOrder,
+  getCheckoutBlock,
   isActiveHold,
   ordersFor,
   sendEmail,
+  setCheckoutBlock,
   type Order,
 } from "./orderStore";
 
 export const MAX_SEATS_PER_STUDENT = 4;
 export const MAX_NAME_LENGTH = 80;
 
+// SEC-16: more than 5 checkouts for one event within 10 minutes blocks that student for 30 minutes.
+export const MAX_CHECKOUTS_PER_WINDOW = 5;
+export const CHECKOUT_WINDOW_MINUTES = 10;
+export const CHECKOUT_BLOCK_MINUTES = 30;
+
+const clockTime = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hour: "numeric", minute: "2-digit" });
+
 export type CheckoutError = {
   ok: false;
-  status: 400 | 401 | 402 | 404 | 409;
+  status: 400 | 401 | 402 | 404 | 409 | 429;
   code: string;
   message: string;
   allowanceRemaining?: number;
@@ -93,8 +102,24 @@ export function startCheckout(
   const event = typeof input.eventId === "string" ? getUpcomingEvent(input.eventId, now) : undefined;
   if (!event) return fail(404, "event_not_found", "This event isn't available.");
 
-  // The 4-seat cap covers everything this student has paid for or is holding for this event.
   const key = nameKey(name);
+
+  // SEC-16: stop one student from tying up seats by starting checkout over and over.
+  const blockedUntil = getCheckoutBlock(key, event.eventId);
+  const tooMany = (until: number) =>
+    fail(429, "too_many_checkouts", `Too many checkouts for this event. Try again after ${clockTime.format(new Date(until))}.`);
+  if (blockedUntil !== undefined && now.getTime() < blockedUntil) return tooMany(blockedUntil);
+  const windowStart = now.getTime() - CHECKOUT_WINDOW_MINUTES * 60 * 1000;
+  const recentStarts = ordersFor(event.eventId).filter(
+    (o) => o.buyerKey === key && new Date(o.createdAt).getTime() > windowStart,
+  ).length;
+  if (recentStarts >= MAX_CHECKOUTS_PER_WINDOW) {
+    const until = now.getTime() + CHECKOUT_BLOCK_MINUTES * 60 * 1000;
+    setCheckoutBlock(key, event.eventId, until);
+    return tooMany(until);
+  }
+
+  // The 4-seat cap covers everything this student has paid for or is holding for this event.
   const alreadyHas = ordersFor(event.eventId)
     .filter((o) => o.buyerKey === key && (o.status === "paid" || isActiveHold(o, now)))
     .reduce((sum, o) => sum + o.seats, 0);

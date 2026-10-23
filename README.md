@@ -27,7 +27,7 @@ npm run build
 
 ## Security spec audit
 
-Checked before Story 3 was built, against [docs/Starter Spec A - Tartan Tickets - SECURITY_SPEC.md](docs/Starter%20Spec%20A%20-%20Tartan%20Tickets%20-%20SECURITY_SPEC.md) on 2026-10-22, for the build at commit `422a633` (Story 1 only).
+Checked before Story 3 was built (rows marked "updated" were re-checked later), against [docs/Starter Spec A - Tartan Tickets - SECURITY_SPEC.md](docs/Starter%20Spec%20A%20-%20Tartan%20Tickets%20-%20SECURITY_SPEC.md) on 2026-10-22, for the build at commit `422a633` (Story 1 only).
 
 Status key: **Fully** = met today; **Partly** = some of it is met; **Not met** = not built yet. "Fully" can also mean met only because the feature it restricts doesn't exist yet; each such row says so and needs re-checking when that feature is built.
 
@@ -48,7 +48,7 @@ Status key: **Fully** = met today; **Partly** = some of it is met; **Not met** =
 | SEC-13 | Not met | QR codes and ticket tokens don't exist yet. |
 | SEC-14 | Not met | Check-in scanning doesn't exist yet. |
 | SEC-15 | Not met | No scanning and no rate limiting exist. |
-| SEC-16 | Not met | No checkout and no rate limiting exist. |
+| SEC-16 | Partly (updated for HW3 Part C) | The server refuses a 6th checkout for the same event within 10 minutes and blocks that student from checking out for that event for 30 minutes (HTTP 429), proven by `tests/sec16-checkout-rate-limit.test.ts`. Still missing: the "account" is a typed name, so someone can dodge the block by typing a different name until real sign-in (SEC-1) exists, and blocks are kept in memory, so they reset on every deploy. |
 | SEC-17 | Fully (for now) | No personal data is collected at all; must be re-checked once purchases store data. |
 | SEC-18 | Not met | No attendee data exists and no automatic 90-day removal job is built. |
 | SEC-19 | Not met | No attendee export feature exists. |
