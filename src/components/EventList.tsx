@@ -37,7 +37,17 @@ export function EventCard({ event }: { event: EventListing }) {
             <dd className={seatsClass}>{formatSeatsRemaining(event.seatsRemaining)}</dd>
           </div>
         </dl>
-        <ComingSoonButton label={soldOut ? "Join waitlist" : "Buy"} eventTitle={event.title} />
+        {soldOut ? (
+          // The waitlist is Story 4, not built yet.
+          <ComingSoonButton label="Join waitlist" eventTitle={event.title} />
+        ) : (
+          // Story 3: Buy opens the checkout page. A plain form works without JavaScript.
+          <form className="action" action={`/events/${encodeURIComponent(event.eventId)}`} method="get">
+            <button type="submit" className="button" aria-label={`Buy: ${event.title}`}>
+              Buy
+            </button>
+          </form>
+        )}
       </article>
     </li>
   );

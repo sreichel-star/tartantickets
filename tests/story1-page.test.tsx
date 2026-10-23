@@ -46,10 +46,12 @@ describe("Story 1: event list screen", () => {
     expect(screen.getByText("Only 3 left!")).toBeInTheDocument();
   });
 
+  // Updated for Story 3: Buy now opens checkout (see story3_ui_buy_button_opens_checkout_page).
+  // Join waitlist is still a placeholder until Story 4 is built.
   it("story1_buttons_say_coming_soon_when_clicked", () => {
-    render(<EventList events={[listing]} />);
+    render(<EventList events={[{ ...listing, seatsRemaining: 0 }]} />);
     expect(screen.queryByText("Coming soon")).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /^Buy/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Join waitlist/ }));
     expect(screen.getByText("Coming soon")).toBeInTheDocument();
   });
 

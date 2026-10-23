@@ -1,10 +1,33 @@
 # Tartan Tickets
 
-Ticketing web app for student club events. Built so far: Story 1 (browse upcoming events), live at https://tartan-tickets-sigma.vercel.app. Event data is made-up sample data kept in server memory. Sign-in, payments and a database don't exist yet.
+Ticketing web app for student club events, live at https://tartan-tickets-sigma.vercel.app.
+
+## What is built
+
+- **Story 1: Browse events.** Upcoming events with date, location, price and seats left. Sold-out events show "Join waitlist".
+- **Story 3: Buy tickets** (HW3). Click **Buy**, type your name, choose 1–4 tickets and click **Hold my seats**. The seats are held for 10 minutes. **Simulated payment** issues one QR-code ticket per seat and records a receipt email. **Simulate declined card** releases the seats. A student can hold or buy at most 4 tickets per event, and a sold-out event offers the waitlist.
+
+"Join waitlist" still just says "Coming soon" (Story 4 is not built).
+
+## Non-goals for now (HW3 scope)
+
+- **No real payments.** "Simulated payment" and "Simulate declined card" buttons stand in for Stripe Checkout. No card is ever charged or entered.
+- **No real authentication.** A name typed into a text box stands in for university sign-in (Story 2). Anyone can type any name.
+- **No real email.** The receipt email is recorded in a server-side outbox instead of being sent; the receipt and QR codes are shown on screen.
+- **No database.** Events, orders and tickets live in server memory. **All data resets on every deploy** (and whenever the server restarts), so sold seats return to the sample numbers.
+
+## Run and test
+
+```bash
+npm install
+npm run dev     # http://localhost:3000
+npm test        # 48 tests: tests/story1-*.test.* and tests/story3-*.test.*
+npm run build
+```
 
 ## Security spec audit
 
-Checked against [docs/Starter Spec A - Tartan Tickets - SECURITY_SPEC.md](docs/Starter%20Spec%20A%20-%20Tartan%20Tickets%20-%20SECURITY_SPEC.md) on 2026-10-22, for the build at commit `422a633` (Story 1 only).
+Checked before Story 3 was built, against [docs/Starter Spec A - Tartan Tickets - SECURITY_SPEC.md](docs/Starter%20Spec%20A%20-%20Tartan%20Tickets%20-%20SECURITY_SPEC.md) on 2026-10-22, for the build at commit `422a633` (Story 1 only).
 
 Status key: **Fully** = met today; **Partly** = some of it is met; **Not met** = not built yet. "Fully" can also mean met only because the feature it restricts doesn't exist yet; each such row says so and needs re-checking when that feature is built.
 

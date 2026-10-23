@@ -1,3 +1,5 @@
+import { heldSeatsFor } from "./orderStore";
+
 // Event data for Story 1 (Browse events).
 // For now, events live in server memory and are made-up sample data.
 // They reset whenever the server restarts. A real database comes later.
@@ -139,18 +141,39 @@ export function seatsRemaining(event: Pick<ClubEvent, "capacity" | "seatsSold">)
   return Math.max(0, event.capacity - event.seatsSold);
 }
 
+function isUpcoming(e: ClubEvent, now: Date): boolean {
+  return e.status === "published" && new Date(e.startsAt).getTime() > now.getTime();
+}
+
+/** Seats sold plus seats held in an unfinished checkout (Story 3) are not available. */
+function toListing({ seatsSold, status, ...rest }: ClubEvent, now: Date): EventListing {
+  return {
+    ...rest,
+    seatsRemaining: seatsRemaining({ capacity: rest.capacity, seatsSold: seatsSold + heldSeatsFor(rest.eventId, now) }),
+  };
+}
+
 /**
  * Upcoming events: published, not yet started, soonest first.
  * `now` can be passed in so tests can control the current time.
  */
 export function listUpcomingEvents(now: Date = new Date(), events: ClubEvent[] = store): EventListing[] {
   return events
-    .filter((e) => e.status === "published" && new Date(e.startsAt).getTime() > now.getTime())
+    .filter((e) => isUpcoming(e, now))
     .sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime())
-    .map(({ seatsSold, status, ...rest }) => ({
-      ...rest,
-      seatsRemaining: seatsRemaining({ capacity: rest.capacity, seatsSold }),
-    }));
+    .map((e) => toListing(e, now));
+}
+
+/** One upcoming event by ID, or undefined if it is unknown, past, or cancelled. */
+export function getUpcomingEvent(eventId: string, now: Date = new Date()): EventListing | undefined {
+  const e = store.find((x) => x.eventId === eventId);
+  return e && isUpcoming(e, now) ? toListing(e, now) : undefined;
+}
+
+/** Story 3: count paid seats as sold. */
+export function recordSale(eventId: string, seats: number): void {
+  const e = store.find((x) => x.eventId === eventId);
+  if (e) e.seatsSold += seats;
 }
 
 /** Test helper: replace the in-memory events. */
@@ -162,3 +185,4 @@ export function __setEventsForTesting(events: ClubEvent[]): void {
 export function __resetEvents(): void {
   store = sampleEvents.map((e) => ({ ...e }));
 }
+
