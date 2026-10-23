@@ -7,10 +7,12 @@ const root = import.meta.dirname;
 
 export default defineConfig({
   plugins: [react()],
+  // The colon in this folder name trips Vite's file-access check, so tests could not load.
+  server: { fs: { strict: false } },
   resolve: { alias: { "@": path.join(root, "src") } },
   test: {
     environment: "jsdom",
     globals: true,
-    setupFiles: [path.join(root, "tests/setup.ts")],
+    setupFiles: ["./tests/setup.ts"],
   },
 });
